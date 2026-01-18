@@ -8,7 +8,8 @@ export const userService = {
     getById,
     remove,
     add,
-    getByEmail
+    getByEmail,
+    update
 }
 
 async function query() {
@@ -62,17 +63,40 @@ async function remove(userId) {
 }
 
 async function add(user) {
+    
     try {
         const userToAdd = {
             name: user.name,
             password: user.password,
             email: user.email,
+            isOnboarded: user.isOnboarded || false,
         }
         const collection = await dbService.getCollection('user')
         await collection.insertOne(userToAdd)
         return userToAdd
     } catch (err) {
         loggerService.error('cannot add user', err)
+        throw err
+    }
+}
+
+async function update(user) {
+    try {
+        // peek only updatable properties
+        const userToSave = {
+            _id: ObjectId.createFromHexString(user._id), 
+            name: user.name,
+            email: user.email,
+            preferences: user.preferences,
+            isOnboarded: user.isOnboarded
+        }
+        console.log('userToSave:', userToSave);
+        
+        const collection = await dbService.getCollection('user')
+        await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
+        return userToSave
+    } catch (err) {
+        loggerService.error(`cannot update user ${user._id}`, err)
         throw err
     }
 }

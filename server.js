@@ -16,6 +16,16 @@ const server = http.createServer(app)
 app.use(cookieParser())
 app.use(express.json())
 
+// Debug middleware
+app.use((req, res, next) => {
+    console.log('\n=== Incoming Request ===')
+    console.log('Method:', req.method)
+    console.log('URL:', req.url)
+    console.log('Cookies:', req.cookies)
+    console.log('=======================\n')
+    next()
+})
+
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('public')))
 } else {
@@ -31,11 +41,14 @@ if (process.env.NODE_ENV === 'production') {
     app.use(cors(corsOptions))
 }
 
+// app.all('/*all', setupAsyncLocalStorage)
 
-app.all('/*all', setupAsyncLocalStorage)
+// app.use('/api/auth', authRoutes)
+// app.use('/api/user', userRoutes)
 
-app.use('/api/auth', authRoutes)
-app.use('/api/user', userRoutes)
+
+app.use('/api/auth', setupAsyncLocalStorage, authRoutes)
+app.use('/api/user', setupAsyncLocalStorage, userRoutes)
 
 
 
