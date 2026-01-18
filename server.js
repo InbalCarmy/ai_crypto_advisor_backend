@@ -16,15 +16,6 @@ const server = http.createServer(app)
 app.use(cookieParser())
 app.use(express.json())
 
-// Debug middleware
-app.use((req, res, next) => {
-    console.log('\n=== Incoming Request ===')
-    console.log('Method:', req.method)
-    console.log('URL:', req.url)
-    console.log('Cookies:', req.cookies)
-    console.log('=======================\n')
-    next()
-})
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('public')))
