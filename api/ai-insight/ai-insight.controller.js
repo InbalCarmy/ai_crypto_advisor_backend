@@ -6,7 +6,7 @@ export async function getInsight(req, res) {
         const { assets, investorType } = req.query
         const assetList = assets ? assets.split(',') : []
 
-        const result = await aiInsightService.generateInsight(assetList, investorType)
+        const result = await aiInsightService.generateInsight(assetList, investorType)        
         res.json(result)
     } catch (err) {
         loggerService.error('Failed to generate AI insight', err)

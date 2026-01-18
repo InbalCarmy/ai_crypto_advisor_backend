@@ -5,7 +5,7 @@ export async function getNews(req, res) {
     try {
         const { currencies } = req.query
         const news = await newsService.getNews(currencies)
-        console.log('news fron controller', news);
+        // console.log('news fron controller', news);
         
         res.json(news)
     } catch (err) {

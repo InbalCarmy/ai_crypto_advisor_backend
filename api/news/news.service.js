@@ -25,8 +25,6 @@ async function getNews(currencies = 'BTC,ETH') {
         }
 
         const data = await response.json()
-
-        console.log('data:', data);
         
 
         // Transform and return the results
