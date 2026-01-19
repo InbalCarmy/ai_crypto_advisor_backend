@@ -37,14 +37,12 @@ if (process.env.NODE_ENV === 'production') {
     app.use(cors(corsOptions))
 }
 
-// app.all('/*all', setupAsyncLocalStorage)
-
-// app.use('/api/auth', authRoutes)
-// app.use('/api/user', userRoutes)
 
 
-app.use('/api/auth', setupAsyncLocalStorage, authRoutes)
-app.use('/api/user', setupAsyncLocalStorage, userRoutes)
+app.all('/*all', setupAsyncLocalStorage)
+
+app.use('/api/auth', authRoutes)
+app.use('/api/user', userRoutes)
 app.use('/api/news', newsRoutes)
 app.use('/api/ai-insight', aiInsightRoutes)
 app.use('/api/coin-prices', coinPricesRoutes)
