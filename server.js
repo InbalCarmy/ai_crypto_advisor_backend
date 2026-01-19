@@ -53,7 +53,10 @@ app.use('/api/feedback', feedbackRoutes)
 // and allow vue/react-router to take it from there
 
 // Serve the frontend for any non-API routes (MUST be last!)
-app.get('*', (req, res) => {
+// app.get('*', (req, res) => {
+//     res.sendFile(path.resolve('public/index.html'))
+// })
+app.get('/*all', (req, res) => {
     res.sendFile(path.resolve('public/index.html'))
 })
 
