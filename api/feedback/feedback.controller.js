@@ -16,17 +16,6 @@ export async function getFeedbacks(req, res){
 
 }
 
-// export async function getFeedbackByUserId(req, res){
-//     try {
-//         const userId = req.params.userId
-//         const feedbacks = await feedbackService.getFeedbackByUser(userId)
-//         res.json(feedbacks)
-//     } catch(err){
-//         loggerService.erre('Faild to get feedback by user id', err)
-//         res.status(400).send({err: 'Faild to get feedbacks by user id'})
-//     }
-
-// }
 
 export async function addFeedback(req, res){
     const {body : feedbackData} = req
@@ -38,15 +27,3 @@ export async function addFeedback(req, res){
         res.status(400).send({err: 'Faild to add feedback'})
     }
 }
-
-// export async function getFeedbackBySectionName(req, res){
-//     try {
-//         const section = req.params.sectionName
-//         const feedbacks = await feedbackService.getFeedbackBySection(section)
-//         res.json(feedbacks)
-//     } catch(err){
-//         loggerService.erre('Faild to get feedback by section name', err)
-//         res.status(400).send({err: 'Faild to get feedbacks by section name'})
-//     }
-
-// }

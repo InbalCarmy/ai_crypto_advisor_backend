@@ -3,8 +3,6 @@ import { loggerService } from '../../services/logger.service.js'
 
 export const feedbackService = {
     addFeedback,
-    // getFeedbackByUser,
-    // getFeedbackBySection,
     query
 }
 
@@ -12,14 +10,14 @@ async function addFeedback(feedbackData) {
     try {
         const collection = await dbService.getCollection('feedback')
 
-        // Check if user already voted on this content
+        //if user already voted on this content
         const existingVote = await collection.findOne({
             userId: feedbackData.userId,
             sectionType: feedbackData.sectionType,
             contentId: feedbackData.contentId
         })
 
-        // If vote is null, remove the vote
+        //if vote is null, remove the vote
         if (feedbackData.vote === null) {
             if (existingVote) {
                 await collection.deleteOne({ _id: existingVote._id })
@@ -29,7 +27,7 @@ async function addFeedback(feedbackData) {
             return { message: 'No vote to remove' }
         }
 
-        // If user already voted, update the vote
+        //if vote exist, update the vote
         if (existingVote) {
             await collection.updateOne(
                 { _id: existingVote._id },
@@ -44,7 +42,7 @@ async function addFeedback(feedbackData) {
             return { message: 'Vote updated successfully', _id: existingVote._id }
         }
 
-        // Otherwise, create a new vote
+        //create a new vote
         const feedback = {
             userId: feedbackData.userId,
             sectionType: feedbackData.sectionType,
@@ -64,28 +62,6 @@ async function addFeedback(feedbackData) {
         throw err
     }
 }
-
-// async function getFeedbackByUser(userId) {
-//     try {
-//         const collection = await dbService.getCollection('feedback')
-//         const feedback = await collection.find({ userId }).toArray()
-//         return feedback
-//     } catch (err) {
-//         loggerService.error(`Cannot get feedback for user ${userId}`, err)
-//         throw err
-//     }
-// }
-
-// async function getFeedbackBySection(sectionType) {
-//     try {
-//         const collection = await dbService.getCollection('feedback')
-//         const feedback = await collection.find({ sectionType }).toArray()
-//         return feedback
-//     } catch (err) {
-//         loggerService.error(`Cannot get feedback for section ${sectionType}`, err)
-//         throw err
-//     }
-// }
 
 export async function query(filterBy = {}) {
   try {
@@ -107,12 +83,10 @@ export async function query(filterBy = {}) {
 function _buildCriteria(filterBy = {}) {
   const criteria = {}
 
-  // userId filter - stored as string in feedback collection
   if (filterBy.userId) {
     criteria.userId = filterBy.userId
   }
 
-  // sectionType filter
   if (filterBy.sectionType) {
     criteria.sectionType = filterBy.sectionType
   }

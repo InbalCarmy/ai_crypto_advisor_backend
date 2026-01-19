@@ -112,18 +112,18 @@ async function getByEmail(email) {
     }
 }
 
-function _buildCriteria(filterBy) {
-    const criteria = {}
-    if (filterBy.txt) {
-        const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
-        criteria.$or = [
-            {
-                name: txtCriteria,
-            },
-            {
-                email: txtCriteria,
-            },
-        ]
-    }
-    return criteria
-}
+// function _buildCriteria(filterBy) {
+//     const criteria = {}
+//     if (filterBy.txt) {
+//         const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
+//         criteria.$or = [
+//             {
+//                 name: txtCriteria,
+//             },
+//             {
+//                 email: txtCriteria,
+//             },
+//         ]
+//     }
+//     return criteria
+// }
