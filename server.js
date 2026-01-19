@@ -37,10 +37,9 @@ if (process.env.NODE_ENV === 'production') {
     app.use(cors(corsOptions))
 }
 
+app.all('*', setupAsyncLocalStorage)
 
-
-app.all('/*all', setupAsyncLocalStorage)
-
+// API Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/news', newsRoutes)
@@ -56,8 +55,8 @@ app.use('/api/feedback', feedbackRoutes)
 // it will still serve the index.html file
 // and allow vue/react-router to take it from there
 
-// Uncomment when you have a public/index.html file
-app.get('/*all', (req, res) => {
+// Serve the frontend for any non-API routes
+app.get('*', (req, res) => {
     res.sendFile(path.resolve('public/index.html'))
 })
 
