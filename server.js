@@ -10,6 +10,7 @@ import { newsRoutes } from './api/news/news.routes.js'
 import { aiInsightRoutes } from './api/ai-insight/ai-insight.routes.js'
 import { coinPricesRoutes } from './api/coin-prices/coin-prices.routes.js'
 import { memeRoutes } from './api/meme/meme.routes.js'
+import { feedbackRoutes } from './api/feedback/feedback.routes.js'
 
 import { setupAsyncLocalStorage } from './middlewares/setupAls.middleware.js'
 
@@ -48,6 +49,7 @@ app.use('/api/news', newsRoutes)
 app.use('/api/ai-insight', aiInsightRoutes)
 app.use('/api/coin-prices', coinPricesRoutes)
 app.use('/api/meme', memeRoutes)
+app.use('/api/feedback', feedbackRoutes)
 
 
 
