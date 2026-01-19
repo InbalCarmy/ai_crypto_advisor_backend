@@ -4,9 +4,7 @@ import { loggerService } from '../../services/logger.service.js'
 export async function getNews(req, res) {
     try {
         const { currencies } = req.query
-        const news = await newsService.getNews(currencies)
-        // console.log('news fron controller', news);
-        
+        const news = await newsService.getNews(currencies)        
         res.json(news)
     } catch (err) {
         loggerService.error('Failed to get news', err)

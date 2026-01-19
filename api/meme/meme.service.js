@@ -5,7 +5,6 @@ export const memeService = {
 
 async function getMeme() {
     try {
-        // Fetch from Reddit's cryptocurrency memes subreddit
         const response = await fetch('https://www.reddit.com/r/CryptoCurrency/hot.json?limit=50')
 
         if (!response.ok) {
@@ -27,7 +26,6 @@ async function getMeme() {
             throw new Error('No crypto memes found')
         }
 
-        // Get a random meme from the filtered posts
         const randomIndex = Math.floor(Math.random() * memePosts.length)
         const randomMeme = memePosts[randomIndex].data
 

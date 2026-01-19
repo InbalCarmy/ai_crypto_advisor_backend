@@ -3,7 +3,6 @@ export const newsService = {
     getNews
 }
 
-// Static fallback news data
 const FALLBACK_NEWS = {
     results: [
         {
@@ -77,7 +76,6 @@ async function getNews(currencies = 'BTC,ETH') {
             return FALLBACK_NEWS
         }
 
-        // Transform and return the results
         return {
             results: data.results.slice(0, 5).map(article => ({
                 id: article.id,
