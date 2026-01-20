@@ -9,21 +9,23 @@ export const feedbackService = {
 async function addFeedback(feedbackData) {
     try {
         const collection = await dbService.getCollection('feedback')
+        const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
 
-        // Simple query: just userId and sectionType
+        // Query includes userId, sectionType, and date
         const query = {
             userId: feedbackData.userId,
-            sectionType: feedbackData.sectionType
+            sectionType: feedbackData.sectionType,
+            date: today
         }
 
-        // Check if user already voted on this section
+        // Check if user already voted on this section today
         const existingVote = await collection.findOne(query)
 
         // If vote is null, remove the vote
         if (feedbackData.vote === null) {
             if (existingVote) {
                 await collection.deleteOne({ _id: existingVote._id })
-                loggerService.info(`Vote removed for user ${feedbackData.userId} on section ${feedbackData.sectionType}`)
+                loggerService.info(`Vote removed for user ${feedbackData.userId} on section ${feedbackData.sectionType} for ${today}`)
                 return { message: 'Vote removed successfully' }
             }
             return { message: 'No vote to remove' }
@@ -39,7 +41,7 @@ async function addFeedback(feedbackData) {
                 { _id: existingVote._id },
                 { $set: updatedFeedback }
             )
-            loggerService.info(`Vote updated for user ${feedbackData.userId} on section ${feedbackData.sectionType}`)
+            loggerService.info(`Vote updated for user ${feedbackData.userId} on section ${feedbackData.sectionType} for ${today}`)
             return { ...existingVote, ...updatedFeedback }
         }
 
@@ -47,12 +49,13 @@ async function addFeedback(feedbackData) {
         const feedback = {
             userId: feedbackData.userId,
             sectionType: feedbackData.sectionType,
+            date: today,
             vote: feedbackData.vote,
             timestamp: new Date()
         }
 
         const result = await collection.insertOne(feedback)
-        loggerService.info(`New vote added: ${result.insertedId} for section ${feedbackData.sectionType}`)
+        loggerService.info(`New vote added: ${result.insertedId} for section ${feedbackData.sectionType} on ${today}`)
 
         const createdFeedback = { ...feedback, _id: result.insertedId }
         return createdFeedback
@@ -85,6 +88,10 @@ function _buildCriteria(filterBy = {}) {
 
   if (filterBy.sectionType) {
     criteria.sectionType = filterBy.sectionType
+  }
+
+  if (filterBy.date) {
+    criteria.date = filterBy.date
   }
 
   return criteria

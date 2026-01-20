@@ -1,3 +1,5 @@
+import { dbService } from '../../services/db.service.js'
+import { loggerService } from '../../services/logger.service.js'
 
 export const memeService = {
     getMeme
@@ -29,7 +31,7 @@ async function getMeme() {
         const randomIndex = Math.floor(Math.random() * memePosts.length)
         const randomMeme = memePosts[randomIndex].data
 
-        return {
+        const memeData = {
             id: randomMeme.id,
             title: randomMeme.title,
             url: randomMeme.url,
@@ -39,8 +41,36 @@ async function getMeme() {
             permalink: `https://reddit.com${randomMeme.permalink}`,
             thumbnail: randomMeme.thumbnail
         }
+
+        // Save meme to database
+        await saveMemeToDb(memeData)
+
+        return memeData
     } catch (err) {
         console.error('Error fetching crypto meme:', err)
         throw err
+    }
+}
+
+
+async function saveMemeToDb(memeData) {
+    try {
+        const collection = await dbService.getCollection('cryptoMeme')
+
+        // Check if meme already exists by Reddit id
+        const existingMeme = await collection.findOne({ id: memeData.id })
+
+        if (!existingMeme) {
+            await collection.insertOne({
+                ...memeData,
+                savedAt: new Date()
+            })
+            loggerService.info(`Saved new meme: ${memeData.id}`)
+        } else {
+            loggerService.info(`Meme ${memeData.id} already exists in DB`)
+        }
+    } catch (err) {
+        loggerService.error('Error saving meme to DB', err)
+        // Don't throw - meme fetching should still work even if DB save fails
     }
 }

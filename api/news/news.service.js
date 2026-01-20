@@ -1,5 +1,8 @@
+import { dbService } from '../../services/db.service.js'
+import { loggerService } from '../../services/logger.service.js'
 
 export const newsService = {
+    getNewsFromApi,
     getNews
 }
 
@@ -48,7 +51,7 @@ const FALLBACK_NEWS = {
     ]
 }
 
-async function getNews(currencies = 'BTC,ETH') {
+async function getNewsFromApi(currencies = 'BTC,ETH') {
     try {
         const baseUrl = 'https://cryptopanic.com/api/developer/v2/posts/'
         const params = new URLSearchParams({
@@ -91,5 +94,42 @@ async function getNews(currencies = 'BTC,ETH') {
         console.error('Error fetching news:', err)
         console.log('Using fallback news data')
         return FALLBACK_NEWS
+    }
+}
+
+async function getNews(userId, currencies = 'BTC,ETH') {
+    try {
+        const collection = await dbService.getCollection('marketNews')
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const cachedNews = await collection.findOne({
+            userId: userId,
+            date: { $gte: today },
+            currencies: currencies
+        })
+
+        if (cachedNews) {
+            loggerService.info(`Returning cached news for user ${userId}`)
+            return cachedNews.news
+        }
+
+        // If no cached news, fetch from API
+        loggerService.info(`No cached news found, fetching from API for user ${userId}`)
+        const news = await getNewsFromApi(currencies)
+
+        // Save to database
+        await collection.insertOne({
+            userId: userId,
+            currencies: currencies,
+            news: news,
+            date: new Date()
+        })
+
+        return news
+    } catch (err) {
+        loggerService.error('Error getting news from DB', err)
+        return await getNewsFromApi(currencies)
     }
 }

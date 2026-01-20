@@ -5,7 +5,8 @@ export async function getFeedbacks(req, res){
     try{
         const filterBy ={
             sectionType: req.query.sectionType || '',
-            userId: req.query.userId || ''
+            userId: req.query.userId || '',
+            date: req.query.date || ''
         }
         const feedbacks = await feedbackService.query(filterBy)
         res.json(feedbacks)
