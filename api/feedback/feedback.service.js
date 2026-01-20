@@ -10,62 +10,49 @@ async function addFeedback(feedbackData) {
     try {
         const collection = await dbService.getCollection('feedback')
 
-        let query = {
+        // Simple query: just userId and sectionType
+        const query = {
             userId: feedbackData.userId,
             sectionType: feedbackData.sectionType
         }
 
-        //not all feedbacks have contentId so add specific identifier based on section type
-        if (feedbackData.sectionType === 'coinPrices') {
-            query.contentId = feedbackData.contentId
-        } else if (feedbackData.sectionType === 'cryptoMeme') {
-            query['metadata.meme'] = feedbackData.metadata?.meme
-        } else if (feedbackData.sectionType === 'aiInsight') {
-            query['metadata.aiInsight'] = feedbackData.metadata?.aiInsight
-        } else if (feedbackData.sectionType === 'marketNews') {
-            query['metadata.articleTitle'] = feedbackData.metadata?.articleTitle
-        }
-
-        //if user already voted on this content
+        // Check if user already voted on this section
         const existingVote = await collection.findOne(query)
 
-        //if vote is null, remove the vote
+        // If vote is null, remove the vote
         if (feedbackData.vote === null) {
             if (existingVote) {
                 await collection.deleteOne({ _id: existingVote._id })
-                loggerService.info(`Vote removed for user ${feedbackData.userId}`)
+                loggerService.info(`Vote removed for user ${feedbackData.userId} on section ${feedbackData.sectionType}`)
                 return { message: 'Vote removed successfully' }
             }
-            return
+            return { message: 'No vote to remove' }
         }
 
-        //if vote exist, update the vote
+        // If vote exists, update it
         if (existingVote) {
             const updatedFeedback = {
-                ...existingVote,
                 vote: feedbackData.vote,
-                timestamp: new Date(feedbackData.timestamp)
+                timestamp: new Date()
             }
             await collection.updateOne(
                 { _id: existingVote._id },
                 { $set: updatedFeedback }
             )
-            loggerService.info(`Vote updated for user ${feedbackData.userId}`)
-            return updatedFeedback
+            loggerService.info(`Vote updated for user ${feedbackData.userId} on section ${feedbackData.sectionType}`)
+            return { ...existingVote, ...updatedFeedback }
         }
 
-        //create a new vote
+        // Create a new vote
         const feedback = {
             userId: feedbackData.userId,
             sectionType: feedbackData.sectionType,
-            contentId: feedbackData.contentId,
             vote: feedbackData.vote,
-            metadata: feedbackData.metadata || {},
-            timestamp: new Date(feedbackData.timestamp)
+            timestamp: new Date()
         }
 
         const result = await collection.insertOne(feedback)
-        loggerService.info(`New vote added: ${result.insertedId}`)
+        loggerService.info(`New vote added: ${result.insertedId} for section ${feedbackData.sectionType}`)
 
         const createdFeedback = { ...feedback, _id: result.insertedId }
         return createdFeedback
