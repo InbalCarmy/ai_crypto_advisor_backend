@@ -3,10 +3,10 @@ import { loggerService } from '../../services/logger.service.js'
 
 export async function getInsight(req, res) {
     try {
-        const { assets, investorType } = req.query
+        const { assets, investorType, userId } = req.query
         const assetList = assets ? assets.split(',') : []
 
-        const result = await aiInsightService.generateInsight(assetList, investorType)        
+        const result = await aiInsightService.getDailtInsight(assetList, investorType, userId)        
         res.json(result)
     } catch (err) {
         loggerService.error('Failed to generate AI insight', err)

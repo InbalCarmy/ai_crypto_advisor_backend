@@ -4,8 +4,8 @@ import { loggerService } from '../../services/logger.service.js'
 
 export async function getPrices(req, res) {
     try {
-        const { assets } = req.query
-        const prices = await pricesService.getPrices(assets)
+        const { assets, userId } = req.query
+        const prices = await pricesService.getPrices(userId, assets)
         res.json(prices)
     } catch (err) {
         loggerService.error('Failed to get coin prices', err)

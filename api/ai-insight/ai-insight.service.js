@@ -1,6 +1,9 @@
+import { dbService } from '../../services/db.service.js'
+import { loggerService } from '../../services/logger.service.js'
 
 export const aiInsightService = {
-    generateInsight
+    generateInsight,
+    getDailtInsight
 }
 
 async function generateInsight(assets = [], investorType = 'General') {
@@ -52,4 +55,42 @@ Just provide the insight text, nothing else.`
         console.error('Error generating insight:', err)
         throw err
     }
+}
+
+async function getDailtInsight(assets = [], investorType = 'General', userId){
+    try {
+        const collection = await dbService.getCollection('aiInsight')
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const cachedInsight = await collection.findOne({
+            userId: userId,
+            date: { $gte: today },
+        })
+
+        if (cachedInsight) {
+            loggerService.info(`Returning cached insight for user ${userId}`)
+            return cachedInsight.insight
+        }
+
+        // If no cached insight, fetch from API
+        loggerService.info(`No cached insight found, fetching from API for user ${userId}`)
+        const insight = await generateInsight(assets, investorType)
+
+        // Save to database
+        await collection.insertOne({
+            userId: userId,
+            assets: assets,
+            investorType: investorType,
+            insight: insight,
+            date: new Date()
+        })
+
+        return prices
+    } catch (err) {
+        loggerService.error('Error getting insight from DB', err)
+        return await generateInsight(assets, investorType)
+    }
+
 }
