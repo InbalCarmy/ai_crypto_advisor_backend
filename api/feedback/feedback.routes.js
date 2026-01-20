@@ -5,7 +5,7 @@ import {  getFeedbacks, addFeedback } from './feedback.controller.js'
 
 const router = express.Router()
 
-router.get('/', getFeedbacks)
-router.post('/' ,addFeedback)
+router.get('/', requireAuth, getFeedbacks)
+router.post('/', requireAuth, addFeedback)
 
 export const feedbackRoutes = router
