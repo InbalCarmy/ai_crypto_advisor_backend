@@ -10,12 +10,24 @@ async function addFeedback(feedbackData) {
     try {
         const collection = await dbService.getCollection('feedback')
 
-        //if user already voted on this content
-        const existingVote = await collection.findOne({
+        let query = {
             userId: feedbackData.userId,
-            sectionType: feedbackData.sectionType,
-            contentId: feedbackData.contentId
-        })
+            sectionType: feedbackData.sectionType
+        }
+
+        //not all feedbacks have contentId so add specific identifier based on section type
+        if (feedbackData.sectionType === 'coinPrices') {
+            query.contentId = feedbackData.contentId
+        } else if (feedbackData.sectionType === 'cryptoMeme') {
+            query['metadata.meme'] = feedbackData.metadata?.meme
+        } else if (feedbackData.sectionType === 'aiInsight') {
+            query['metadata.aiInsight'] = feedbackData.metadata?.aiInsight
+        } else if (feedbackData.sectionType === 'marketNews') {
+            query['metadata.articleTitle'] = feedbackData.metadata?.articleTitle
+        }
+
+        //if user already voted on this content
+        const existingVote = await collection.findOne(query)
 
         //if vote is null, remove the vote
         if (feedbackData.vote === null) {
@@ -29,17 +41,17 @@ async function addFeedback(feedbackData) {
 
         //if vote exist, update the vote
         if (existingVote) {
+            const updatedFeedback = {
+                ...existingVote,
+                vote: feedbackData.vote,
+                timestamp: new Date(feedbackData.timestamp)
+            }
             await collection.updateOne(
                 { _id: existingVote._id },
-                {
-                    $set: {
-                        vote: feedbackData.vote,
-                        timestamp: new Date(feedbackData.timestamp)
-                    }
-                }
+                { $set: updatedFeedback }
             )
             loggerService.info(`Vote updated for user ${feedbackData.userId}`)
-            return { message: 'Vote updated successfully', _id: existingVote._id }
+            return { message: 'Vote updated successfully', feedback: updatedFeedback }
         }
 
         //create a new vote
@@ -52,11 +64,16 @@ async function addFeedback(feedbackData) {
             timestamp: new Date(feedbackData.timestamp)
         }
 
-        console.log('Saving feedback:', feedback)
         const result = await collection.insertOne(feedback)
         loggerService.info(`New vote added: ${result.insertedId}`)
 
-        return { message: 'Vote added successfully', _id: result.insertedId }
+        console.log("result:", result);
+        
+
+        
+
+        const createdFeedback = { ...feedback, _id: result.insertedId }
+        return { message: 'Vote added successfully', feedback: createdFeedback }
     } catch (err) {
         loggerService.error('Cannot add feedback', err)
         throw err
@@ -66,12 +83,9 @@ async function addFeedback(feedbackData) {
 export async function query(filterBy = {}) {
   try {
     const criteria = _buildCriteria(filterBy)
-    console.log('Query filterBy:', filterBy)
-    console.log('Query criteria:', criteria)
     const collection = await dbService.getCollection("feedback")
 
     const feedbacks = await collection.find(criteria).toArray()
-    console.log('Found feedbacks:', feedbacks.length)
     return feedbacks
   } catch (err) {
     loggerService.error("Cannot get feedback", err)

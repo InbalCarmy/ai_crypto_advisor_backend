@@ -37,8 +37,6 @@ if (process.env.NODE_ENV === 'production') {
     }
     app.use(cors(corsOptions))
 }
-
-// API Routes - These must come BEFORE the catch-all route
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/news', newsRoutes)
@@ -47,16 +45,8 @@ app.use('/api/coin-prices', coinPricesRoutes)
 app.use('/api/meme', memeRoutes)
 app.use('/api/feedback', feedbackRoutes)
 
-// Make every unhandled server-side-route match index.html
-// so when requesting http://localhost:3030/unhandled-route...
-// it will still serve the index.html file
-// and allow vue/react-router to take it from there
-
 // Serve the frontend for any non-API routes (MUST be last!)
-// app.get('*', (req, res) => {
-//     res.sendFile(path.resolve('public/index.html'))
-// })
-app.get('/*all', (req, res) => {
+app.get('*', (req, res) => {
     res.sendFile(path.resolve('public/index.html'))
 })
 
