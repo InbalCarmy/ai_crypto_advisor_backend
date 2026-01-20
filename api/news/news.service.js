@@ -54,7 +54,8 @@ async function getNews(currencies = 'BTC,ETH') {
         const params = new URLSearchParams({
             auth_token: process.env.CRYPTOPANIC_API_KEY,
             currencies: currencies,
-            filter: 'hot'
+            filter: 'hot',
+            kind: 'news'
         })
 
         const fullUrl = `${baseUrl}?${params}`
