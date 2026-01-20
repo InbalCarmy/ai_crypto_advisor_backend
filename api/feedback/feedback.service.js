@@ -9,19 +9,18 @@ export const feedbackService = {
 async function addFeedback(feedbackData) {
     try {
         const collection = await dbService.getCollection('feedback')
-        const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0]
 
-        // Query includes userId, sectionType, and date
         const query = {
             userId: feedbackData.userId,
             sectionType: feedbackData.sectionType,
             date: today
         }
 
-        // Check if user already voted on this section today
+        //check if user already voted on this section today
         const existingVote = await collection.findOne(query)
 
-        // If vote is null, remove the vote
+        // remove the vote if it's null
         if (feedbackData.vote === null) {
             if (existingVote) {
                 await collection.deleteOne({ _id: existingVote._id })
@@ -31,7 +30,7 @@ async function addFeedback(feedbackData) {
             return { message: 'No vote to remove' }
         }
 
-        // If vote exists, update it
+        //if vote exists update it
         if (existingVote) {
             const updatedFeedback = {
                 vote: feedbackData.vote,
@@ -45,7 +44,7 @@ async function addFeedback(feedbackData) {
             return { ...existingVote, ...updatedFeedback }
         }
 
-        // Create a new vote
+        //new vote
         const feedback = {
             userId: feedbackData.userId,
             sectionType: feedbackData.sectionType,

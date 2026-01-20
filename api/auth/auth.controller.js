@@ -11,8 +11,6 @@ export async function login(req, res) {
         const loginToken = authService.getLoginToken(user)
         // res.cookie('loginToken', loginToken, { sameSite: 'None', secure: true })
         res.cookie('loginToken', loginToken, { sameSite: 'Lax', httpOnly: false })
-
-
         res.json(user)
     } catch (err) {
         loggerService.error('Failed to Login ' + err)

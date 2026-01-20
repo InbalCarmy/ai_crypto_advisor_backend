@@ -2,7 +2,6 @@ import { MongoClient } from 'mongodb'
 
 import { config } from '../config/index.js'
 import { loggerService} from './logger.service.js'
-// console.log('config:', config)
 
 export const dbService = { getCollection }
 

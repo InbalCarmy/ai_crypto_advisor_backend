@@ -63,11 +63,9 @@ async function getPrices(userId, assets) {
     try {
         const collection = await dbService.getCollection('coinPrice')
 
-        // Get today's date at midnight (to match all prices from today)
         const today = new Date()
         today.setHours(0, 0, 0, 0)
 
-        // Find prices for this user from today
         const cachedPrices = await collection.findOne({
             userId: userId,
             date: { $gte: today },
@@ -83,7 +81,7 @@ async function getPrices(userId, assets) {
         loggerService.info(`No cached prices found, fetching from API for user ${userId}`)
         const prices = await getPricesFromApi(assets)
 
-        // Save to database
+        //save to database
         await collection.insertOne({
             userId: userId,
             assets: assets,

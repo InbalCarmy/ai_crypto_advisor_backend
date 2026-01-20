@@ -90,7 +90,6 @@ async function update(user) {
             preferences: user.preferences,
             isOnboarded: user.isOnboarded
         }
-        console.log('userToSave:', userToSave);
         
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
