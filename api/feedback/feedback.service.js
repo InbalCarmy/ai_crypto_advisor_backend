@@ -36,7 +36,7 @@ async function addFeedback(feedbackData) {
                 loggerService.info(`Vote removed for user ${feedbackData.userId}`)
                 return { message: 'Vote removed successfully' }
             }
-            return { message: 'No vote to remove' }
+            return
         }
 
         //if vote exist, update the vote
@@ -51,7 +51,7 @@ async function addFeedback(feedbackData) {
                 { $set: updatedFeedback }
             )
             loggerService.info(`Vote updated for user ${feedbackData.userId}`)
-            return { message: 'Vote updated successfully', feedback: updatedFeedback }
+            return updatedFeedback
         }
 
         //create a new vote
@@ -67,13 +67,8 @@ async function addFeedback(feedbackData) {
         const result = await collection.insertOne(feedback)
         loggerService.info(`New vote added: ${result.insertedId}`)
 
-        console.log("result:", result);
-        
-
-        
-
         const createdFeedback = { ...feedback, _id: result.insertedId }
-        return { message: 'Vote added successfully', feedback: createdFeedback }
+        return createdFeedback
     } catch (err) {
         loggerService.error('Cannot add feedback', err)
         throw err
