@@ -71,6 +71,5 @@ async function saveMemeToDb(memeData) {
         }
     } catch (err) {
         loggerService.error('Error saving meme to DB', err)
-        // Don't throw - meme fetching should still work even if DB save fails
     }
 }
